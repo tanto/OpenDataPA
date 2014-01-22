@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="it">
+<head>
+	<meta charset="UTF-8">
+	<title>Palermo - elenco dei siti turistici visitabili</title>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" /><![endif]-->
+	<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
+	<link rel="stylesheet" href="./resources/MarkerCluster.css" />
+	<link rel="stylesheet" href="./resources/MarkerCluster.Default.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="./resources/MarkerCluster.Default.ie.css" /><![endif]-->
+	<script src="./resources/leaflet.markercluster-src.js"></script>
+
+	<style type="text/css">
+	html, body, #map {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+	</style>
+	<script src="./ga.js"></script>
+</head>
+<body>
+	<div id="map"></div>
+	<script src="./resources/data.js"></script>
+	<script>
+
+	var map = L.map('map');
+
+	var acetateUrl =  'http://{s}.acetate.geoiq.com/tiles/acetate/{z}/{x}/{y}.png';
+	var acetateAttrib = '2011 GeoIQ &#038; Stamen, Data from OSM and Natural Earth';
+	var acetate = new L.TileLayer(acetateUrl, {maxZoom: 18, attribution: acetateAttrib, subdomains: ['a1', 'a2', 'a3']});
+
+
+	// L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+	// 	maxZoom: 18,
+	// 	attribution: 'PinPoint <a href="http://www.comune.palermo.it/">Comune di Palermo</a>, Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery <a href="http://cloudmade.com">CloudMade</a>'
+	// }).addTo(map);
+
+	var markers = new L.MarkerClusterGroup({ showCoverageOnHover: false,zoomToBoundsOnClick:true});
+
+	var punti = L.geoJson( bbccaa, 
+		{pointToLayer: function (feature, latlng) {
+
+			if (feature.properties.Tipo == 'ville e giardini') {
+				var raggio = 4
+				var colore = "#A6E22E"
+				var icona = "./resources/urbanpark.png"
+				var myIcon = L.Icon.extend({
+					iconUrl: './resources/urbanpark.png'
+				})
+			}
+			if (feature.properties.Tipo == 'chiese e oratori') {
+				var raggio = 4
+				var colore = "#F92672"
+				var icona = "./resources/church-2.png" 	
+				var myIcon = L.Icon.extend({
+					iconUrl: './resources/church-2.png'
+				}) 				
+			}
+			if (feature.properties.Tipo == 'musei e gallerie d\'arte') {
+				var raggio = 4
+				var colore = "#FD971E"
+				var icona = "./resources/art-museum-2.png"
+				var myIcon = L.Icon.extend({
+					iconUrl: './resources/art-museum-2.png'
+				}) 				
+			}
+			return new L.Marker(latlng, {
+				icon: new myIcon({
+					iconUrl: icona,
+					iconSize: [32, 37],
+					iconAnchor:   [16, 37],
+					popupAnchor:  [0, -30] ,
+					shadowUrl: "./resources/shadow.png",
+					shadowSize: [51, 37]
+				})
+			});
+		},
+		onEachFeature: function(feature, layer)
+		{
+			layer.bindPopup(feature.properties.Nome);
+		}
+	});
+
+		//map.addLayer(punti);
+
+		markers.addLayer(punti);
+		map.addLayer(acetate);
+		map.addLayer(markers);
+		
+		map.fitBounds(markers.getBounds());
+
+
+		</script>
+
+	</body>
+	</html>
